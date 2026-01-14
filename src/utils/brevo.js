@@ -1,10 +1,12 @@
-const brevo = require('@getbrevo/brevo');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 require('dotenv').config();
 
 // Configuration Brevo (anciennement Sendinblue)
-let apiInstance = new brevo.TransactionalEmailsApi();
-let apiKey = apiInstance.authentications['apiKey'];
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 /**
  * Envoie un email de vérification avec code à 6 chiffres
@@ -13,7 +15,7 @@ apiKey.apiKey = process.env.BREVO_API_KEY;
  * @param {string} firstName - Prénom de l'utilisateur (optionnel)
  */
 const sendVerificationEmail = async (to, code, firstName = '') => {
-  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
   sendSmtpEmail.subject = 'Code de vérification - Yara';
   sendSmtpEmail.to = [{ email: to, name: firstName }];
@@ -92,7 +94,7 @@ const sendVerificationEmail = async (to, code, firstName = '') => {
  * @param {string} firstName - Prénom de l'utilisateur
  */
 const sendWelcomeEmail = async (to, firstName) => {
-  const sendSmtpEmail = new brevo.SendSmtpEmail();
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
   sendSmtpEmail.subject = 'Bienvenue sur Yara ! 🎉';
   sendSmtpEmail.to = [{ email: to, name: firstName }];
