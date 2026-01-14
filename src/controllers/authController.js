@@ -1,5 +1,5 @@
 const { User, EmailVerification } = require('../models');
-const { sendVerificationEmail, sendWelcomeEmail } = require('../utils/sendgrid');
+const { sendVerificationEmail, sendWelcomeEmail } = require('../utils/brevo');
 const { validationResult } = require('express-validator');
 
 /**

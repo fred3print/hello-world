@@ -5,7 +5,7 @@ Application Node.js/Express avec authentification sécurisée, validation email 
 ## ✨ Fonctionnalités
 
 - ✅ **Authentification complète** : Inscription, connexion, déconnexion
-- 📧 **Validation email obligatoire** : Code à 6 chiffres envoyé par email (SendGrid)
+- 📧 **Validation email obligatoire** : Code à 6 chiffres envoyé par email (Brevo)
 - 🔒 **Restriction domaine** : Seules les adresses @sprint.fr sont autorisées
 - 🛡️ **Sécurité renforcée** :
   - Hashage des mots de passe (bcrypt)
@@ -38,13 +38,13 @@ Application Node.js/Express avec authentification sécurisée, validation email 
 - express-validator (validation des données)
 
 **Email :**
-- SendGrid (envoi d'emails)
+- Brevo (anciennement Sendinblue - envoi d'emails)
 
 ## 📋 Prérequis
 
 - Node.js 18.x ou supérieur
 - PostgreSQL
-- Compte SendGrid (gratuit : 100 emails/jour)
+- Compte Brevo (gratuit : 300 emails/jour)
 - Compte Heroku (pour le déploiement)
 
 ## 🚀 Installation locale
@@ -89,10 +89,10 @@ SESSION_SECRET=votre-secret-aleatoire-tres-long
 # Database
 DATABASE_URL=postgres://username:password@localhost:5432/yara_db
 
-# SendGrid
-SENDGRID_API_KEY=votre-cle-sendgrid
-SENDGRID_FROM_EMAIL=noreply@votredomaine.com
-SENDGRID_FROM_NAME=Yara
+# Brevo (anciennement Sendinblue)
+BREVO_API_KEY=votre-cle-brevo
+BREVO_FROM_EMAIL=noreply@votredomaine.com
+BREVO_FROM_NAME=Yara
 
 # Application
 APP_NAME=Yara
@@ -100,12 +100,13 @@ APP_URL=http://localhost:3000
 ALLOWED_EMAIL_DOMAIN=sprint.fr
 ```
 
-### 5. Obtenir une clé API SendGrid
+### 5. Obtenir une clé API Brevo
 
-1. Créer un compte sur [SendGrid](https://sendgrid.com/)
-2. Aller dans Settings > API Keys
-3. Créer une nouvelle clé API avec accès "Mail Send"
-4. Copier la clé dans `.env`
+1. Créer un compte gratuit sur [Brevo](https://www.brevo.com/) (anciennement Sendinblue)
+2. Aller dans **Settings > API Keys** (dans le menu en haut à droite)
+3. Cliquer sur **"Generate a new API key"**
+4. Donner un nom à la clé (ex: "Yara Production")
+5. Copier la clé et la coller dans `.env` : `BREVO_API_KEY=xkeysib-...`
 
 ### 6. Lancer l'application
 
@@ -144,15 +145,33 @@ Dans "Settings" > "Config Vars", ajouter :
 ```
 NODE_ENV=production
 SESSION_SECRET=votre-secret-tres-securise
-SENDGRID_API_KEY=votre-cle-sendgrid
-SENDGRID_FROM_EMAIL=noreply@votredomaine.com
-SENDGRID_FROM_NAME=Yara
+BREVO_API_KEY=votre-cle-brevo
+BREVO_FROM_EMAIL=noreply@votredomaine.com
+BREVO_FROM_NAME=Yara
 APP_NAME=Yara
 APP_URL=https://votre-app.herokuapp.com
 ALLOWED_EMAIL_DOMAIN=sprint.fr
 ```
 
 Note : `DATABASE_URL` est automatiquement configurée par Heroku Postgres.
+
+### 3.1. Obtenir une clé API Brevo
+
+**Brevo est gratuit et offre 300 emails/jour** (vs 100 pour SendGrid) :
+
+1. Créer un compte gratuit sur **[Brevo.com](https://www.brevo.com/)** (anciennement Sendinblue)
+2. Vérifier votre email
+3. Aller dans **Settings** (icône en haut à droite) > **SMTP & API** > **API Keys**
+4. Cliquer sur **"Generate a new API key"**
+5. Donner un nom : "Yara Production"
+6. Copier la clé (format : `xkeysib-...`)
+7. La coller dans les Config Vars Heroku : `BREVO_API_KEY`
+
+**Important** : Vous devez aussi configurer un expéditeur vérifié :
+1. Dans Brevo, aller dans **Senders & IP**
+2. Ajouter votre email d'expédition (ou utiliser celui de Brevo)
+3. Vérifier l'email si nécessaire
+4. Utiliser cet email dans `BREVO_FROM_EMAIL`
 
 ### 4. Déployer depuis GitHub
 
@@ -202,7 +221,7 @@ hello-world/
 │   │   └── flash.js            # Middleware messages flash
 │   │
 │   ├── utils/
-│   │   └── sendgrid.js         # Utilitaires SendGrid
+│   │   └── brevo.js            # Utilitaires Brevo (envoi emails)
 │   │
 │   └── views/                  # Templates EJS
 │       ├── partials/
@@ -325,9 +344,10 @@ sudo systemctl start postgresql
 
 ### Emails non reçus
 
-- Vérifier la clé API SendGrid dans `.env`
+- Vérifier la clé API Brevo dans `.env`
+- Vérifier que l'email expéditeur est vérifié dans Brevo
 - Vérifier les spams
-- Vérifier les quotas SendGrid (100/jour gratuit)
+- Vérifier les quotas Brevo (300/jour gratuit)
 
 ### Erreur de session
 

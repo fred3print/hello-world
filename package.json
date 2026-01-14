@@ -34,7 +34,7 @@
     "csurf": "^1.11.0",
     "cookie-parser": "^1.4.6",
     "express-validator": "^7.0.1",
-    "@sendgrid/mail": "^8.1.0",
+    "@getbrevo/brevo": "^1.0.1",
     "crypto": "^1.0.1"
   },
   "devDependencies": {
