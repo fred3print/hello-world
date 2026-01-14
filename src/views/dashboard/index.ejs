@@ -1,0 +1,60 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-house-door"></i> Tableau de bord
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="bi bi-person-circle"></i> Bienvenue, <%= user.firstName || user.email %> !
+                    </h3>
+                    <p class="card-text text-muted">
+                        Vous êtes connecté à votre espace Yara.
+                    </p>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Accès réservé :</strong> Seuls les utilisateurs avec une adresse @sprint.fr peuvent accéder à cette plateforme.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-circle" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            <h5 class="card-title mt-3">Mon Profil</h5>
+                            <p class="card-text text-muted">Gérez vos informations personnelles</p>
+                            <a href="/dashboard/profile" class="btn btn-outline-primary">
+                                <i class="bi bi-person"></i> Voir mon profil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            <h5 class="card-title mt-3">Compte Sécurisé</h5>
+                            <p class="card-text text-muted">
+                                Votre compte est protégé et vérifié
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

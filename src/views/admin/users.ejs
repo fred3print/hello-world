@@ -1,0 +1,203 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>
+                <i class="bi bi-people"></i> Gestion des utilisateurs
+            </h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="/admin/users" class="row g-3">
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="search"
+                                   placeholder="Rechercher par email, prénom ou nom..."
+                                   value="<%= search %>">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Rechercher
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des utilisateurs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Liste des utilisateurs (<%= pagination.total %>)</h5>
+                </div>
+                <div class="card-body">
+                    <% if (users.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Nom</th>
+                                        <th>Rôle</th>
+                                        <th>Statut</th>
+                                        <th>Email vérifié</th>
+                                        <th>Dernière connexion</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% users.forEach(u => { %>
+                                        <tr id="user-<%= u.id %>">
+                                            <td><%= u.email %></td>
+                                            <td><%= u.firstName %> <%= u.lastName %></td>
+                                            <td>
+                                                <select class="form-select form-select-sm" onchange="changeRole('<%= u.id %>', this.value)">
+                                                    <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>Utilisateur</option>
+                                                    <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-<%= u.isActive ? 'success' : 'danger' %>" id="status-<%= u.id %>">
+                                                    <%= u.isActive ? 'Actif' : 'Inactif' %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <% if (u.isEmailVerified) { %>
+                                                    <i class="bi bi-check-circle text-success"></i>
+                                                <% } else { %>
+                                                    <i class="bi bi-x-circle text-danger"></i>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (u.lastLogin) { %>
+                                                    <%= new Date(u.lastLogin).toLocaleDateString('fr-FR') %>
+                                                <% } else { %>
+                                                    <span class="text-muted">Jamais</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-<%= u.isActive ? 'warning' : 'success' %>"
+                                                        onclick="toggleStatus('<%= u.id %>')">
+                                                    <i class="bi bi-<%= u.isActive ? 'pause' : 'play' %>"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteUser('<%= u.id %>')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <% if (pagination.totalPages > 1) { %>
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                                        <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                                            <a class="page-link" href="/admin/users?page=<%= i %><%= search ? '&search=' + search : '' %>">
+                                                <%= i %>
+                                            </a>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            </nav>
+                        <% } %>
+                    <% } else { %>
+                        <p class="text-muted text-center">Aucun utilisateur trouvé</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function toggleStatus(userId) {
+        if (!confirm('Voulez-vous vraiment changer le statut de cet utilisateur ?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const statusBadge = document.getElementById(`status-${userId}`);
+                statusBadge.className = `badge bg-${result.isActive ? 'success' : 'danger'}`;
+                statusBadge.textContent = result.isActive ? 'Actif' : 'Inactif';
+                alert(result.message);
+            } else {
+                alert('Erreur: ' + result.message);
+            }
+        } catch (error) {
+            alert('Une erreur est survenue');
+        }
+    }
+
+    async function changeRole(userId, newRole) {
+        try {
+            const response = await fetch(`/admin/users/${userId}/change-role`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: newRole })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+            } else {
+                alert('Erreur: ' + result.message);
+                location.reload();
+            }
+        } catch (error) {
+            alert('Une erreur est survenue');
+            location.reload();
+        }
+    }
+
+    async function deleteUser(userId) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById(`user-${userId}`).remove();
+                alert(result.message);
+            } else {
+                alert('Erreur: ' + result.message);
+            }
+        } catch (error) {
+            alert('Une erreur est survenue');
+        }
+    }
+</script>
+
+<%- include('../partials/footer') %>

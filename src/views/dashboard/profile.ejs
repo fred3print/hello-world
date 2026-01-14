@@ -1,0 +1,112 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-person-circle"></i> Mon Profil
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i> <%= error %>
+                        </div>
+                    <% } %>
+
+                    <% if (success) { %>
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i> <%= success %>
+                        </div>
+                    <% } %>
+
+                    <form method="POST" action="/dashboard/profile">
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">Prénom</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName"
+                                   value="<%= user.firstName || '' %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName"
+                                   value="<%= user.lastName || '' %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" value="<%= user.email %>" disabled>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> L'adresse email ne peut pas être modifiée
+                            </small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Enregistrer les modifications
+                        </button>
+                        <a href="/dashboard" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle"></i> Informations
+                    </h5>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            <strong>Email vérifié :</strong>
+                            <% if (user.isEmailVerified) { %>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Oui
+                                </span>
+                            <% } else { %>
+                                <span class="badge bg-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Non
+                                </span>
+                            <% } %>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Compte actif :</strong>
+                            <% if (user.isActive) { %>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Oui
+                                </span>
+                            <% } else { %>
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Non
+                                </span>
+                            <% } %>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Rôle :</strong>
+                            <span class="badge <%= user.role === 'admin' ? 'bg-danger' : 'bg-primary' %>">
+                                <%= user.role === 'admin' ? 'Administrateur' : 'Utilisateur' %>
+                            </span>
+                        </li>
+                        <li class="mb-2">
+                            <strong>Membre depuis :</strong><br>
+                            <%= new Date(user.createdAt).toLocaleDateString('fr-FR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            }) %>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
